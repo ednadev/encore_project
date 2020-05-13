@@ -1,12 +1,53 @@
 package mask.dao;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.function.Consumer;
 
+import config.ServerInfo;
 import mask.vo.Cart;
 import mask.vo.Product;
 
 public class MaskImpl implements MaskTemplate{
+	//공통된 로직
+	public MaskImpl(String serverIp) throws ClassNotFoundException {
+		Class.forName(ServerInfo.DRIVER_NAME);
+		System.out.println("드라이브 로딩 성공____ in MaskImpl");
+	}
+	// 비지니스 로직
+	@Override
+	public Connection getConnect() throws SQLException {
+		Connection conn=DriverManager.getConnection(ServerInfo.URL,ServerInfo.USER,ServerInfo.PASS);
+		System.out.println("MaskImpl Connected ____ in MaskImpl");
+		return conn;
+	}
+
+	@Override
+	public void closeAll(PreparedStatement ps, Connection conn) throws SQLException {
+		if(!(ps==null))ps.close();
+		if(!(conn==null)) conn.close();
+	}
+
+	@Override
+	public void closeAll(ResultSet rs, PreparedStatement ps, Connection conn) throws SQLException {
+		if(!(rs==null)) rs.close();
+		closeAll(ps,conn);
+	}
+
+	public void getProperties() throws FileNotFoundException, IOException{			
+		Properties ppt=new Properties();
+		ppt.load(new FileInputStream("src/config/jdbc.properties"));
+	}
+	
+	//비지니스 로직
 	/**addConsumer,login,getCart,deleteMask
 	 * @author 소희
 	 */
