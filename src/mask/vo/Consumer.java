@@ -8,7 +8,6 @@ public class Consumer {
 	private Cart cart;
 	
 	
-	
 	public Consumer(int id, String name, String address, String pass) {		
 		this.id = id;
 		this.name = name;

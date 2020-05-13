@@ -10,17 +10,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.function.Consumer;
 
 import config.ServerInfo;
 import mask.vo.Cart;
 import mask.vo.Product;
+import mask.vo.Consumer;
 
 public class MaskImpl implements MaskTemplate{
 	//공통된 로직
 	public MaskImpl(String serverIp) throws ClassNotFoundException {
 		Class.forName(ServerInfo.DRIVER_NAME);
-		System.out.println("드라이브 로딩 성공____ in MaskImpl");
+		//System.out.println("드라이브 로딩 성공____ in MaskImpl");
 	}
 	// 비지니스 로직
 	@Override

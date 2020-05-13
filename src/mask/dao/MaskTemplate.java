@@ -5,10 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
 import mask.vo.Cart;
 import mask.vo.Product;
+import mask.vo.Consumer;
 
 public interface MaskTemplate {
 
