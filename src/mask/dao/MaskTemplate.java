@@ -1,5 +1,9 @@
 package mask.dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 
@@ -37,6 +41,9 @@ public interface MaskTemplate {
 	ArrayList<String> rankOfSales();
 	//3. 구매 날짜별 판매량 
 	String SalesOfDate();
+	Connection getConnect() throws SQLException;
+	void closeAll(PreparedStatement ps, Connection conn) throws SQLException;
+	void closeAll(ResultSet rs, PreparedStatement ps, Connection conn) throws SQLException;
 	
 /*	//4. 마스크 사이즈별 회원 연령조회 >> 회원아이디에서
 	String getAgeOverSize();

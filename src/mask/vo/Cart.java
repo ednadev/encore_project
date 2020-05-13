@@ -2,13 +2,13 @@ package mask.vo;
 
 public class Cart {
 	private int orderNum;
-	private String consumerid;
+	private int consumerid;
 	private int productNum;
 	private int quantity;
 	private int orderStatus;
 	private int shipStatus;
 
-	public Cart(int orderNum, String consumerid, int productNum, int quantity, int orderStatus, int shipStatus) {
+	public Cart(int orderNum, int consumerid, int productNum, int quantity, int orderStatus, int shipStatus) {
 		super();
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;
@@ -26,11 +26,11 @@ public class Cart {
 		this.orderNum = orderNum;
 	}
 
-	public String getConsumerid() {
+	public int getConsumerid() {
 		return consumerid;
 	}
 
-	public void setConsumerid(String consumerid) {
+	public void setConsumerid(int consumerid) {
 		this.consumerid = consumerid;
 	}
 
