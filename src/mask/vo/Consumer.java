@@ -5,6 +5,7 @@ public class Consumer {
 	private String name;
 	private String address;
 	private String pass;
+	private Cart cart;
 	
 	
 	public Consumer(int id, String name, String address, String pass) {		
@@ -49,6 +50,14 @@ public class Consumer {
 
 	public void setPass(String pass) {
 		this.pass = pass;
+	}
+	
+	public Cart getCart() {
+		return cart;
+	}
+
+	public void setCart(Cart cart) {
+		this.cart = cart;
 	}
 
 	@Override
