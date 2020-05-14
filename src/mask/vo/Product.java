@@ -24,6 +24,8 @@ public class Product {
 		this.productName = productName;
 		this.size = size;
 	}
+	
+	public Product() {}
 
 	public int getProductNum() {
 		return productNum;
