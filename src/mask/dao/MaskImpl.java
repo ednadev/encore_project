@@ -22,7 +22,7 @@ public class MaskImpl implements MaskTemplate{
 	//공통된 로직
 	public MaskImpl(String serverIp) throws ClassNotFoundException {
 		Class.forName(ServerInfo.DRIVER_NAME);
-		System.out.println("드라이브 로딩 성공____ in MaskImpl");
+		//System.out.println("드라이브 로딩 성공____ in MaskImpl");
 	}
 	
 	public MaskImpl() {
