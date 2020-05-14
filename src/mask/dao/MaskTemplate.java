@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Properties;
+=======
+>>>>>>> refs/remotes/origin/ednadev
 
 import mask.vo.Cart;
 import mask.vo.Product;
