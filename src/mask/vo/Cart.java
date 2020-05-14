@@ -9,13 +9,16 @@ public class Cart {
 	private int shipStatus;
 
 	public Cart(int orderNum, int consumerid, int productNum, int quantity, int orderStatus, int shipStatus) {
-		super();
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;
 		this.productNum = productNum;
 		this.quantity = quantity;
 		this.orderStatus = orderStatus;
 		this.shipStatus = shipStatus;
+	}
+
+	public Cart(String productName) {
+		
 	}
 
 	public int getOrderNum() {
