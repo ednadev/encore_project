@@ -1,8 +1,10 @@
 package mask.test;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import mask.dao.MaskImpl;
+import mask.exception.RecordNotFoundException;
 import mask.vo.Cart;
 import mask.vo.Consumer;
 import mask.vo.Product;
@@ -96,7 +98,7 @@ public class MaskTest {
 	}
 	
 	//카트조회 - ArrayList<Cart> getCart(int id)
-	public static void getCart(MaskImpl mi) {
+	public static void getCart(MaskImpl mi) throws SQLException {
 		System.out.println("주민등록번호를 입력해주세요.");
 		int id = sc.nextInt();
 		for(Cart c : mi.getCart(id)) {
@@ -105,31 +107,33 @@ public class MaskTest {
 	}
 	
 	//마스크 삭제 - void deleteMask(int id, Cart cart) <-- 이부분
-	public static void deleteMask(MaskImpl mi) {
+	public static void deleteMask(MaskImpl mi) throws Exception {
 		System.out.println("주민등록번호를 입력해주세요.");
 		int id = sc.nextInt();
 		System.out.println("배송 취소할 마스크를 입력해주세요.");
-		String productName = sc.next();
+		int consumerid = sc.nextInt();
 
-		mi.deleteMask(id, new Cart(productName));
+		mi.deleteMask(id, new Cart(consumerid));
 		System.out.println("마스크 삭제");
 	}
 	
 	//마스크 추가 - void addMask(int id, Cart cart) <-- 이부분
-	public static void addMask(MaskImpl mi) {
+	public static void addMask(MaskImpl mi) throws Exception {
 		System.out.println("주민등록번호를 입력해주세요.");
 		int id = sc.nextInt();
 		System.out.println("구매할 마스크를 입력해주세요.");
-		String productName = sc.next();
-		mi.addMask(id, new Cart(productName));
+		int consumerid = sc.nextInt();
+		
+		mi.addMask(id, new Cart(consumerid));
 		System.out.println("마스크 구매 완료!");
 	}
 	
 	//결제(ship_status : payment 대신 ship_status 가 O이면 결제하고 배송까지 된걸로) - boolean delivery(int orderNum)
 	//배송여부조회(>> 결제랑 같은게 되어버림...ㅜㅠㅜㅠ)
-	public static void delivery(MaskImpl mi) {
+	public static void delivery(MaskImpl mi) throws SQLException, RecordNotFoundException {
 		int orderNum = sc.nextInt();
-		System.out.println("배송여부체크 : " + mi.delivery(orderNum));
+		System.out.println("배송여부체크");
+		mi.delivery(orderNum);
 	}
 	
 	//마스크 사이즈 변경 - void updateMask(int id, Cart cart) <-- 이부분
@@ -140,7 +144,7 @@ public class MaskTest {
 		String productName = sc.next();
 		System.out.println("변경할 상품 사이즈를 입력해주세요.");
 		int size = sc.nextInt();
-		mi.updateMask(id, new Product(productName, size));
+		//mi.updateMask(id, new Cart()); -- Cart 어떤 방식으로 넣어야 할지 다시 확인
 	}
 	
 	//상품입고(insert/update) - void addProductMask(Product product)
@@ -182,7 +186,7 @@ public class MaskTest {
 	}
 	
 	//매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 - ArrayList<String> rankOfSales()
-	public static void rankOfSales(MaskImpl mi) {
+	public static void rankOfSales(MaskImpl mi) throws SQLException {
 		System.out.println("매출 순위 확인");
 		for(String s : mi.rankOfSales()) {
 			System.out.println(s.toString());
