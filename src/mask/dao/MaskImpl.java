@@ -51,21 +51,23 @@ public class MaskImpl implements MaskTemplate{
 	/**addConsumer,login,getCart,deleteMask
 	 * @author 소희
 	 */
+	
+public class Consumer implements addConsumer, login {
 	@Override
 	public void addConsumer(Consumer consumer) {
-		// TODO Auto-generated method stub
+		System.out.println("회원가입");
 		
 	}
 
 	@Override
 	public void login(Consumer consumer) {
-		// TODO Auto-generated method stub
+		System.out.println("로그인");
 		
 	}
-
+public class cart extends getCart implements  {
 	@Override
 	public ArrayList<Cart> getCart() {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
