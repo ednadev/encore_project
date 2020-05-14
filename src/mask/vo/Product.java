@@ -20,6 +20,8 @@ public class Product {
 		this.size=size;
 	}
 	
+	public Product() {}
+
 	public int getProductNum() {
 		return productNum;
 	}
@@ -38,6 +40,13 @@ public class Product {
 	public void setQuatity(int quatity) {
 		this.quatity = quatity;
 	}
+	public int getSize() {
+		return size;
+	}
+	public void setSize(int size) {
+		this.size = size;
+	}
+
 	@Override
 	public String toString() {
 		return "Product [productNum=" + productNum + ", productName=" + productName + ", quatity=" + quatity + "]";
