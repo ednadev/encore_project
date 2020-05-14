@@ -3,23 +3,54 @@ package mask.vo;
 public class Product {
 	private int productNum;
 	private String productName;
-	private int quatity;
+	private int quantity;
 	private int size;
-
-	public Product(int productNum, String productName, int quatity,int size) {
-		super();
+	
+	public Product(int productNum, String productName, int quantity, int size) {
 		this.productNum = productNum;
 		this.productName = productName;
-		this.quatity = quatity;
-		this.size=size;
+		this.quantity = quantity;
+		this.size = size;
+	}
+
+	public Product(String productName, int quantity, int size) {
+		this.productName = productName;
+		this.quantity = quantity;
+		this.size = size;
 	}
 	
-	public Product(int productNum, int size, int quatity) {
+	public Product(String productName, int size) {
+		super();
+		this.productName = productName;
+		this.size = size;
+	}
+	
+	public Product() {}
+
+	public int getProductNum() {
+		return productNum;
+	}
+
+	public void setProductNum(int productNum) {
 		this.productNum = productNum;
-		this.quatity = quatity;
-		this.size=size;
 	}
-	
+
+	public String getProductName() {
+		return productName;
+	}
+
+	public void setProductName(String productName) {
+		this.productName = productName;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
 	public int getSize() {
 		return size;
 	}
@@ -28,27 +59,10 @@ public class Product {
 		this.size = size;
 	}
 
-	public int getProductNum() {
-		return productNum;
-	}
-	public void setProductNum(int productNum) {
-		this.productNum = productNum;
-	}
-	public String getProductName() {
-		return productName;
-	}
-	public void setProductName(String productName) {
-		this.productName = productName;
-	}
-	public int getQuatity() {
-		return quatity;
-	}
-	public void setQuatity(int quatity) {
-		this.quatity = quatity;
-	}
 	@Override
 	public String toString() {
-		return "Product [productNum=" + productNum + ", productName=" + productName + ", quatity=" + quatity + "]";
+		return "Product [productNum=" + productNum + ", productName=" + productName + ", quantity=" + quantity
+				+ ", size=" + size + "]";
 	}
 		
 }

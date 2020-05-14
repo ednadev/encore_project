@@ -8,7 +8,6 @@ public class Cart {
 	private Product product;
 	
 	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus,Product product) {
-		
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;
 		this.productNum = productNum;
@@ -16,6 +15,14 @@ public class Cart {
 		this.shipStatus = shipStatus;
 		this.product=product;
 	}
+
+	public Cart(int orderNum, int consumerid, int productNum) {
+		
+		this.orderNum = orderNum;
+		this.consumerid = consumerid;
+		this.productNum = productNum;
+	}
+
 	public Cart(int consumerid) {
 		this.consumerid = consumerid;
 	}
@@ -53,6 +60,7 @@ public class Cart {
 	public Product getProduct() {
 		return product;
 	}
+
 	public void setProduct(Product product) {
 		this.product = product;
 	}
@@ -61,6 +69,5 @@ public class Cart {
 		return "Cart [orderNum=" + orderNum + ", consumerid=" + consumerid + ", productNum=" + productNum
 				+ ", orderStatus=" + orderStatus + ", shipStatus=" + shipStatus + ", product=" + product + "]";
 	}
-	
-	
+
 }
