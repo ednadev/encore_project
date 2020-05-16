@@ -5,26 +5,48 @@ public class Cart {
 	private int productNum;
 	private int orderStatus;
 	private int shipStatus;
+	private int quantity;
+	private int size;
 	private Product product;
 	
-	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus,Product product) {
+	
+	
+	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus, int quantity, int size, Product product) {
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;
 		this.productNum = productNum;
 		this.orderStatus = orderStatus;
 		this.shipStatus = shipStatus;
-		this.product=product;
+		this.quantity = quantity;
+		this.size = size;
+		this.product = product;
 	}
 
-	public Cart(int orderNum, int consumerid, int productNum) {
-		
+	public Cart(int orderNum,int productNum, int quantity,int size) {	
+		this.orderNum = orderNum;
+		this.productNum = productNum;
+		this.quantity = quantity;
+		this.size = size;
+	}
+	
+	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus, int quantity, int size) {
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;
 		this.productNum = productNum;
+		this.orderStatus = orderStatus;
+		this.shipStatus = shipStatus;
+		this.quantity = quantity;
+		this.size = size;
 	}
-
+	
 	public Cart(int consumerid) {
 		this.consumerid = consumerid;
+	}
+
+
+	public Cart(int consumerid, int productNum) {
+		this.consumerid=consumerid;
+		this.productNum=productNum;
 	}
 
 	public int getOrderNum() {
@@ -64,10 +86,12 @@ public class Cart {
 	public void setProduct(Product product) {
 		this.product = product;
 	}
+
 	@Override
 	public String toString() {
 		return "Cart [orderNum=" + orderNum + ", consumerid=" + consumerid + ", productNum=" + productNum
-				+ ", orderStatus=" + orderStatus + ", shipStatus=" + shipStatus + ", product=" + product + "]";
+				+ ", orderStatus=" + orderStatus + ", shipStatus=" + shipStatus + ", quantity=" + quantity + ", size="
+				+ size + ", product=" + product + "]";
 	}
 
 }

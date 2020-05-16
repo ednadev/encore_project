@@ -3,29 +3,33 @@ package mask.vo;
 public class Product {
 	private int productNum;
 	private String productName;
-	private int quantity;
+	private int stock;
 	private int size;
 	
-	public Product(int productNum, String productName, int quantity, int size) {
+	public Product(int productNum, String productName, int stock, int size) {
 		this.productNum = productNum;
 		this.productName = productName;
-		this.quantity = quantity;
+		this.stock= stock;
 		this.size = size;
 	}
 
-	public Product(String productName, int quantity, int size) {
-		this.productName = productName;
-		this.quantity = quantity;
-		this.size = size;
-	}
-	
-	public Product(String productName, int size) {
-		super();
-		this.productName = productName;
+	public Product(int productNum, int stock, int size) {
+		this.productNum= productNum;
+		this.stock= stock;
 		this.size = size;
 	}
 	
 	public Product() {}
+
+	public Product(int productNum) {
+		this.productNum=productNum;
+	}
+
+	public Product(String productName, int stock, int size) {
+		this.productName= productName;
+		this.stock= stock;
+		this.size = size;
+	}
 
 	public int getProductNum() {
 		return productNum;
@@ -43,14 +47,6 @@ public class Product {
 		this.productName = productName;
 	}
 
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
 	public int getSize() {
 		return size;
 	}
@@ -58,10 +54,18 @@ public class Product {
 	public void setSize(int size) {
 		this.size = size;
 	}
+	
+	public int getStock() {
+		return stock;
+	}
+
+	public int setStock(int stock) {
+		return stock;
+	}
 
 	@Override
 	public String toString() {
-		return "Product [productNum=" + productNum + ", productName=" + productName + ", quantity=" + quantity
+		return "Product [productNum=" + productNum + ", productName=" + productName + ", stock=" + stock
 				+ ", size=" + size + "]";
 	}
 		

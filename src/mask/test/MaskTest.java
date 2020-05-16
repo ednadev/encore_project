@@ -1,9 +1,13 @@
 package mask.test;
 
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import javax.transaction.InvalidTransactionException;
+
 import mask.dao.MaskImpl;
+import mask.exception.PasswordMissmatchException;
 import mask.exception.RecordNotFoundException;
 import mask.vo.Cart;
 import mask.vo.Consumer;
@@ -21,9 +25,10 @@ public class MaskTest {
 		
 		//login(mi);
 		//addConsumer(mi);
-		//getCart(mi);
+		//getCart(mi);//미제사건
 		//deleteMask(mi);
 		//addMask(mi);
+		payment(mi);
 		//delivery(mi);
 		//updateMask(mi);
 		//addProductMask(mi);
@@ -66,146 +71,180 @@ public class MaskTest {
 	}
 	
 	//관리자모드
-	public static void admin(MaskImpl mi) {
-		
-	}
-	
-	//로그인 - void login(int id, String pass)
-	public static void login(MaskImpl mi) throws Exception {
-		//입력받기로는 000000-0000000로 넘어가는 건 0000000 7개만 처리
-		System.out.println("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt(); 
-		System.out.println("비밀번호를 입력해주세요.");
-		String pass = sc.next();
-		mi.login(id, pass);
-		System.out.println("로그인 성공!");
-		System.out.println("1.마스크 구입  2.마이페이지");
-	}
-	
-	//회원가입 - void addConsumer(Consumer consumer)
-	public static void addConsumer(MaskImpl mi) throws Exception {
-		// id값 정규화 처리 --> 입력받을 땐 000000-0000000이거나 0000000000000로만 입력받을 수 있음.. 0000000 7개 자리만 들어갈 수 있도록
-		System.out.println("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt();
-		System.out.println("이름을 입력해주세요.");
-		String name = sc.next();
-		System.out.println("주소를 입력해주세요.");
-		String address = sc.next();
-		System.out.println("비밀번호를 입력해주세요.");
-		String pass = sc.next();
-		mi.addConsumer(new Consumer(id, name, address, pass));
-		// 바로 구매할 수 있도록
-	}
-	
-	//카트조회 - ArrayList<Cart> getCart(int id)
-	public static void getCart(MaskImpl mi) throws SQLException {
-		System.out.println("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt();
-		for(Cart c : mi.getCart(id)) {
-			System.out.println(c.toString());
+		public static void admin(MaskImpl mi) {
+			
 		}
-	}
-	
-	//마스크 삭제 - void deleteMask(int id, Cart cart) <-- 이부분
-	public static void deleteMask(MaskImpl mi) throws Exception {
-		System.out.println("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt();
-		System.out.println("배송 취소할 마스크를 입력해주세요.");
-		int consumerid = sc.nextInt();
+		//로그린 이후에는 회원 ID값은 모두 consumerNum라고 정의 사용 
+		static int consumerNum=0;
+		static int adminNum=0;
+		//회원가입 - void addConsumer(Consumer consumer)
+		public static void addConsumer(MaskImpl mi) throws Exception {
+			// id값 정규화 처리 --> 입력받을 땐 000000-0000000이거나 0000000000000로만 입력받을 수 있음.. 0000000 7개 자리만 들어갈 수 있도록	
+			System.out.println("주민등록번호를 입력해주세요.");
+			int ssn = sc.nextInt(); 
+			System.out.println("성별을 입력해주세요. \n 1.여성\t2.남성 ");
+			String gender = sc.next();
+			try{
+			if(gender.equals("여")||gender.equals("여성")||gender.equals("여자")) consumerNum=10*ssn+2;
+			else if(gender.equals("남")||gender.equals("남성")||gender.equals("남자")) consumerNum=10*ssn+1;}
+			catch(InputMismatchException e) {System.out.println(e.getMessage()+"입력이 올바르지 않습니다.");};
+			/*InputMismatchException는 scanner로 받아오는 모든 경우에 발생할 수 있는 문제로
+			추후에 switch문 완성되면  while문 전체를 try~catch로 잡아야 함.
+			*/
+			System.out.println("이름을 입력해주세요.");
+			String name = sc.next();
+			System.out.println("주소를 입력해주세요.");
+			String address = sc.next();
+			System.out.println("비밀번호를 입력해주세요.");
+			String pass = sc.next();
+			mi.addConsumer(new Consumer(consumerNum, name, address, pass));
+			// 바로 구매할 수 있도록
+		}
 
-		mi.deleteMask(id, new Cart(consumerid));
-		System.out.println("마스크 삭제");
-	}
-	
-	//마스크 추가 - void addMask(int id, Cart cart) <-- 이부분
-	public static void addMask(MaskImpl mi) throws Exception {
-		System.out.println("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt();
-		System.out.println("구매할 마스크를 입력해주세요.");
-		int consumerid = sc.nextInt();
 		
-		mi.addMask(id, new Cart(consumerid));
-		System.out.println("마스크 구매 완료!");
-	}
-	
-	//결제(ship_status : payment 대신 ship_status 가 O이면 결제하고 배송까지 된걸로) - boolean delivery(int orderNum)
-	//배송여부조회(>> 결제랑 같은게 되어버림...ㅜㅠㅜㅠ)
-	public static void delivery(MaskImpl mi) throws SQLException, RecordNotFoundException {
-		int orderNum = sc.nextInt();
-		System.out.println("배송여부체크");
-		mi.delivery(orderNum);
-	}
-	
-	//마스크 사이즈 변경 - void updateMask(int id, Cart cart) <-- 이부분
-	public static void updateMask(MaskImpl mi) {
-		System.out.print("주민등록번호를 입력해주세요.");
-		int id = sc.nextInt();
-		System.out.println("상품명을 입력해주세요.");
-		String productName = sc.next();
-		System.out.println("변경할 상품 사이즈를 입력해주세요.");
-		int size = sc.nextInt();
-		//mi.updateMask(id, new Cart()); -- Cart 어떤 방식으로 넣어야 할지 다시 확인
-	}
-	
-	//상품입고(insert/update) - void addProductMask(Product product)
-	public static void addProductMask(MaskImpl mi) throws Exception {
-		System.out.println("상품명을 입력해주세요.");
-		String productName = sc.next();
-		System.out.println("상품 수량을 입력해주세요.");
-		int quantity = sc.nextInt();
-		System.out.println("상품 크기를 입력해주세요.");
-		int size = sc.nextInt();
-		mi.addProductMask(new Product(productName, quantity, size));
-	}
-	
-	//상품 조회 - ArrayList<Product> getProducts()
-	public static void getProduct(MaskImpl mi) throws Exception {
-		System.out.println("상품 조회");
-		for(Product p : mi.getProducts()) {
-			System.out.println(p.toString());
+		//로그인 - void login(int id, String pass)
+		public static void login(MaskImpl mi) throws Exception {
+			try {
+			System.out.println("ID를 입력해주세요."); 
+			int id= sc.nextInt();
+			System.out.println("비밀번호를 입력해주세요.");
+			String pass = sc.next();
+			mi.login(id, pass);
+			System.out.println("로그인 성공!");
+			System.out.println("1.마스크 구입  2.마이페이지");
+			}catch(PasswordMissmatchException e) {
+				System.out.println(e.getMessage());
+			}catch(Exception e){
+				System.out.println(e.getMessage());
+			}
 		}
-	}
-	
-	//상품 출고 - void updateProductMask(Product product)
-	public static void updateProductMask(MaskImpl mi) throws Exception {
-		System.out.println("상품명을 입력해주세요.");
-		String productName = sc.next();
-		System.out.println("상품 수량을 입력해주세요.");
-		int quantity = sc.nextInt();
-		System.out.println("상품 크기를 입력해주세요."); // 1: 소, 2: 중, 3: 대 
-		System.out.println("1.소    2.중    3.대");
-		int size = sc.nextInt();
 		
-		mi.updateProductMask(new Product(productName, quantity, size));
-		System.out.println("상품 출고 되었습니다.");
-	}
-	
-	//사이즈별 재고수량조회  ex)"대 : 27개, 중 : 30개 ,소 : 10개" >> String 형식으로 출력하기 - String getQuatityOverSize()
-	public static void getQuatityOverSize(MaskImpl mi) throws Exception {
-		System.out.println("사이즈별 재고수량: " + mi.getQuatityOverSize());
-	}
-	
-	//매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 - ArrayList<String> rankOfSales()
-	public static void rankOfSales(MaskImpl mi) throws SQLException {
-		System.out.println("매출 순위 확인");
-		for(String s : mi.rankOfSales()) {
-			System.out.println(s.toString());
+		//카트조회 - ArrayList<Cart> getCart(int id)
+		public static void getCart(MaskImpl mi) throws Exception {
+			try{
+			System.out.println("고객번호를 입력해주세요.");// 고객번호 없애고
+			int id = sc.nextInt();// id에 바로 consumerNum 집어넣기.
+			for(Cart c : mi.getCart(id)) {
+				System.out.println(c.toString());}
+			}catch(SQLException e) {System.out.println(e.getMessage());
+			}
+			}
+		
+		
+		//마스크 삭제 - void deleteMask(int id, Cart cart) <-- 이부분
+		public static void deleteMask(MaskImpl mi) throws RecordNotFoundException, Exception {
+			System.out.println("고객번호를 입력해주세요.");
+			int id = sc.nextInt();
+			System.out.println("장바구니에서 없앨 주문 번호를 입력해주세요.");
+			int orderNum = sc.nextInt();
+			try {
+				mi.deleteMask(id,orderNum);
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
 		}
-	}
-	
-	//구매 날짜별 판매량  - String SalesOfDate()
-	public static void salesOfDate(MaskImpl mi) {
-		System.out.println("구매 날짜별 판매량 확인: " + mi.SalesOfDate());
-	}			
-				
-	//이부분 시간되면..
-	//마스크 사이즈별 회원 연령조회 >> 회원아이디에서 - String getAgeOverSize()
-	public static void getAgeOverSize(MaskImpl mi) {
 		
-	}
-	
-	//마스크 사이즈별 회원 성별조회  >> 회원아이디에서 - String getGenderOverSize()
-	public static void getGenderOverSize(MaskImpl mi) {
+		//마스크 추가 - void addMask(int id, Cart cart) <-- 이부분
+		public static void addMask(MaskImpl mi) throws Exception {
+			System.out.println("주민등록번호를 입력해주세요.");
+			int id = sc.nextInt();
+			System.out.println("구매할 마스크를 입력해주세요.");
+			String productName = sc.next();
+			mi.addMask(id, new Cart(id));
+			System.out.println("마스크 구매 완료!");
+		}
+		
+		public static void payment(MaskImpl mi) throws RecordNotFoundException, Exception {
+			try {
+			System.out.println("고객번호를 입력해주세요.");
+			int id = sc.nextInt();
+			System.out.println("결제를 진행할 상품번호를 입력해주세요.");
+			int productNum = sc.nextInt();
+			mi.payment(id,productNum);}
+			catch(RecordNotFoundException e) {
+				System.out.println(e.getMessage());
+			}catch(SQLException e) {
+				System.out.println("상품번호를 잘못 입력하셨습니다.");
+			}
+		}
+		
+		//결제(ship_status : payment 대신 ship_status 가 O이면 결제하고 배송까지 된걸로) - boolean delivery(int orderNum)
+		//배송여부조회(>> 결제랑 같은게 되어버림...ㅜㅠㅜㅠ)
+		public static void delivery(MaskImpl mi) throws Exception {
+			int orderNum = sc.nextInt();
+			System.out.println("배송여부체크");
+			mi.delivery(orderNum);
+		}
+		
+		//마스크 사이즈, 마스크 종류 변경 - void updateMask(int id, Cart cart) <-- 이부분
+		public static void updateMask(MaskImpl mi) {
+			System.out.print("주민등록번호를 입력해주세요.");
+			int id = sc.nextInt();
+			System.out.println("상품명을 입력해주세요.");
+			String productName = sc.next();
+			System.out.println("변경할 상품 사이즈를 입력해주세요.");
+			int size = sc.nextInt();
+			//mi.updateMask(id, new Cart()); -- Cart 어떤 방식으로 넣어야 할지 다시 확인
+		}
+		
+		//상품입고(insert/update) - void addProductMask(Product product)
+		public static void addProductMask(MaskImpl mi) throws Exception {
+			System.out.println("상품명을 입력해주세요.");
+			String productName = sc.next();
+			System.out.println("상품 수량을 입력해주세요.");
+			int quantity = sc.nextInt();
+			System.out.println("상품 크기를 입력해주세요.");
+			int size = sc.nextInt();
+			mi.addProductMask(new Product(productName,quantity,size));
+		}
+		
+		//상품 조회 - ArrayList<Product> getProducts()
+		public static void getProduct(MaskImpl mi) throws Exception {
+			System.out.println("상품 조회");
+			for(Product p : mi.getProducts()) {
+				System.out.println(p.toString());
+			}
+		}
+		
+		//상품 출고 - void updateProductMask(Product product)
+		public static void updateProductMask(MaskImpl mi) throws Exception {
+			System.out.println("상품명을 입력해주세요.");
+			String productName = sc.next();
+			System.out.println("상품명을 입력해주세요.");
+			int quantity = sc.nextInt();
+			System.out.println("상품 크기를 입력해주세요."); // 1: 소, 2: 중, 3: 대 
+			System.out.println("1.소    2.중    3.대");
+			int size = sc.nextInt();
+			mi.updateProductMask(new Product(productName, quantity, size));
+			System.out.println("상품 출고 되었습니다.");
+		}
+		
+		//사이즈별 재고수량조회  ex)"대 : 27개, 중 : 30개 ,소 : 10개" >> String 형식으로 출력하기 - String getQuatityOverSize()
+		public static void getQuatityOverSize(MaskImpl mi) throws Exception {
+			System.out.println("사이즈별 재고수량: " + mi.getQuatityOverSize());
+		}
+		
+		//매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 - ArrayList<String> rankOfSales()
+		public static void rankOfSales(MaskImpl mi) throws SQLException {
+			System.out.println("매출 순위 확인");
+			for(String s : mi.rankOfSales()) {
+				System.out.println(s.toString());
+			}
+		}
+		
+		//구매 날짜별 판매량  - String SalesOfDate()
+		public static void salesOfDate(MaskImpl mi) {
+			System.out.println("구매 날짜별 판매량 확인: " + mi.SalesOfDate());
+		}			
+					
+		//이부분 시간되면..
+		//마스크 사이즈별 회원 연령조회 >> 회원아이디에서 - String getAgeOverSize()
+		public static void getAgeOverSize(MaskImpl mi) {
+			
+		}
+		
+		//마스크 사이즈별 회원 성별조회  >> 회원아이디에서 - String getGenderOverSize()
+		public static void getGenderOverSize(MaskImpl mi) {
 
+		}
 	}
-}

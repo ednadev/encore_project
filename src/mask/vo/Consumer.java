@@ -19,6 +19,10 @@ public class Consumer {
 		this.pass = pass;
 	}
 
+	public Consumer() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getId() {
 		return id;
 	}
