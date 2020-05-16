@@ -25,8 +25,8 @@ public class MaskDAOTest {
 		Product product3=new Product(3, "mask3", 140, 3);
 		Product product4=new Product(4, "mask4", 50, 3);
 		
-		Cart cart1=new Cart(20200513, 9509212 , 1);
-		Cart cart2=new Cart(20200513, 9210232 ,3);
+		//Cart cart1=new Cart(20200513, 9509212 , 1);
+		//Cart cart2=new Cart(20200513, 9210232 ,3);
 	
 	
 		MaskImpl mask=new MaskImpl();
