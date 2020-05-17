@@ -1,84 +1,59 @@
 package mask.vo;
 public class Cart {
-	private int orderNum;
-	private int consumerid;
+	private int consumerId;
 	private int productNum;
+	private int orderNum;
+	private String date;
+	private int quantity;
 	private int orderStatus;
 	private int shipStatus;
-	private int quantity;
-	private int size;
+	
 	private Product product;
 	
+	public Cart() {
+	}
 	
-	
-	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus, int quantity, int size, Product product) {
+	public Cart(int orderNum, String date, int quantity, int shipStatus, Product product) {
 		this.orderNum = orderNum;
-		this.consumerid = consumerid;
-		this.productNum = productNum;
-		this.orderStatus = orderStatus;
-		this.shipStatus = shipStatus;
+		this.date = date;
 		this.quantity = quantity;
-		this.size = size;
+		this.shipStatus = shipStatus;
 		this.product = product;
 	}
-
-	public Cart(int orderNum,int productNum, int quantity,int size) {	
-		this.orderNum = orderNum;
-		this.productNum = productNum;
-		this.quantity = quantity;
-		this.size = size;
-	}
 	
-	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus, int quantity, int size) {
+	public Cart(int consumerId, int orderNum, String date, int quantity, int orderStatus, int shipStatus, Product product) {
+		this.consumerId = consumerId;
 		this.orderNum = orderNum;
-		this.consumerid = consumerid;
-		this.productNum = productNum;
+		this.date = date;
+		this.quantity = quantity;
 		this.orderStatus = orderStatus;
 		this.shipStatus = shipStatus;
-		this.quantity = quantity;
-		this.size = size;
+		this.product = product;
 	}
 	
-	public Cart(int consumerid) {
-		this.consumerid = consumerid;
-	}
-
-
-	public Cart(int consumerid, int productNum) {
-		this.consumerid=consumerid;
-		this.productNum=productNum;
-	}
-
-	public int getOrderNum() {
-		return orderNum;
-	}
-	public void setOrderNum(int orderNum) {
-		this.orderNum = orderNum;
-	}
-	public int getConsumerid() {
-		return consumerid;
-	}
-	public void setConsumerid(int consumerid) {
-		this.consumerid = consumerid;
-	}
-	public int getProductNum() {
-		return productNum;
-	}
-	public void setProductNum(int productNum) {
+	public Cart(int consumerId, int productNum, int orderNum, int quantity) {
+		this.consumerId = consumerId;
 		this.productNum = productNum;
+		this.orderNum = orderNum;
+		this.quantity = quantity;
 	}
-	public int getOrderStatus() {
-		return orderStatus;
+
+	public Cart(int consumerId, int productNum, int quantity) {
+		this.consumerId = consumerId;
+		this.productNum = productNum;
+		this.quantity = quantity;
 	}
-	public void setOrderStatus(int orderStatus) {
+	public Cart(int consumerId, int productNum, int orderNum, String date, int quantity, int orderStatus,
+			int shipStatus) {
+		this.consumerId = consumerId;
+		this.productNum = productNum;
+		this.orderNum = orderNum;
+		this.date = date;
+		this.quantity = quantity;
 		this.orderStatus = orderStatus;
-	}
-	public int getShipStatus() {
-		return shipStatus;
-	}
-	public void setShipStatus(int shipStatus) {
 		this.shipStatus = shipStatus;
 	}
+
 	public Product getProduct() {
 		return product;
 	}
@@ -87,11 +62,66 @@ public class Cart {
 		this.product = product;
 	}
 
-	@Override
-	public String toString() {
-		return "Cart [orderNum=" + orderNum + ", consumerid=" + consumerid + ", productNum=" + productNum
-				+ ", orderStatus=" + orderStatus + ", shipStatus=" + shipStatus + ", quantity=" + quantity + ", size="
-				+ size + ", product=" + product + "]";
+	public int getConsumerId() {
+		return consumerId;
 	}
 
+	public void setConsumerId(int consumerId) {
+		this.consumerId = consumerId;
+	}
+
+	public int getProductNum() {
+		return productNum;
+	}
+
+	public void setProductNum(int productNum) {
+		this.productNum = productNum;
+	}
+
+	public int getOrderNum() {
+		return orderNum;
+	}
+
+	public void setOrderNum(int orderNum) {
+		this.orderNum = orderNum;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public int getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(int orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+	public int getShipStatus() {
+		return shipStatus;
+	}
+
+	public void setShipStatus(int shipStatus) {
+		this.shipStatus = shipStatus;
+	}
+
+	@Override
+	public String toString() {
+		return "Cart [consumerId=" + consumerId + ", productNum=" + productNum + ", orderNum=" + orderNum + ", date="
+				+ date + ", quantity=" + quantity + ", orderStatus=" + orderStatus + ", shipStatus=" + shipStatus + "]";
+	}
+	
 }
