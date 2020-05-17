@@ -7,14 +7,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.spi.CalendarDataProvider;
 
 import javax.naming.spi.DirStateFactory.Result;
 
 import config.ServerInfo;
 
 import mask.exception.DuplicateIdException;
+import mask.exception.OutOfStockException;
 import mask.exception.PasswordMissmatchException;
 import mask.exception.RecordNotFoundException;
 
@@ -23,7 +30,7 @@ import mask.vo.Consumer;
 import mask.vo.Product;
 
 public class MaskImpl implements MaskTemplate{
-	
+
 	//공통된 로직
 	public MaskImpl(String serverIp) throws ClassNotFoundException {
 		Class.forName(ServerInfo.DRIVER_NAME);
@@ -72,13 +79,21 @@ public class MaskImpl implements MaskTemplate{
 	 * @throws IOException 
 	 * @throws FileNotFoundException 
 	 */
-	@Override
+
 	public Properties getProperties() throws Exception{			
 		Properties ppt=new Properties();
 		ppt.load(new FileInputStream("src/config/jdbc.properties"));
 		return ppt;
 	}
 
+	public boolean isProductExist(String productName, int size,Connection conn) throws Exception {
+		String sql_isProductExist="SELECT * FROM product where product_name=? and size=?";
+		PreparedStatement ps=conn.prepareStatement(sql_isProductExist);
+		ps.setString(1,productName); ps.setInt(2,size);
+		ResultSet rs = ps.executeQuery();
+		return rs.next();
+	}
+	
 	public boolean isConsumerExist(int id,Connection conn) throws Exception {
 		String sql_isConsumerExist="SELECT id FROM consumer where id=?";
 		PreparedStatement ps=conn.prepareStatement(sql_isConsumerExist);
@@ -259,25 +274,25 @@ public class MaskImpl implements MaskTemplate{
 			System.out.println("====== transation start =======");
 			conn.setAutoCommit(false);
 			if(isCartExist(id, conn)) {
-				if(chaeckOrderStatus(id,productNum,conn)==0) {
+				if(checkOrderStatus(id,productNum,conn)==0) {
 				// 결제하기 : order_status를 1로 update	
 				String sql_orderStatus= ppt.getProperty("jdbc.sql.pay_order_status");
 				ps = conn.prepareStatement(sql_orderStatus);			
-				ps.setInt(1,1);ps.setInt(2,2); ps.setInt(3,id);ps.setInt(4,productNum);
+				ps.setInt(1,InputOrderNum());ps.setInt(2,1);ps.setInt(3,2); 
+				ps.setInt(4,id);ps.setInt(5,productNum);
 				System.out.println(ps.executeUpdate()+", "+id+"님, 상품번호 : "+ productNum+"을 결제하셨습니다.");	
-				chaeckOrderStatus(id,productNum,conn);
+				checkOrderStatus(id,productNum,conn);
 				ps.close();
 				//재고에서 물건 빼기
 				String sql="select * from cart where consumer_id=? and product_num=? and ship_status=2";
 				ps=conn.prepareStatement(sql);
-				ps.setInt(1,id);
-				ps.setInt(2,productNum);
+				ps.setInt(1,id);ps.setInt(2,productNum);
 				rs=ps.executeQuery();
 				if(rs.next()) {
 					updateProductMask(new Product(productNum, rs.getInt("quantity"),rs.getInt("size")));
 					}ps.close();
 				// delivery update하기
-				if(chaeckShipStatus(id,productNum,conn)==2) {
+				if(checkShipStatus(id,productNum,conn)==2) {
 					String sql2=ppt.getProperty("jdbc.sql.pay_ship_status");
 					ps=conn.prepareStatement(sql2);
 					ps.setInt(1,id); ps.setInt(2,productNum);
@@ -290,17 +305,21 @@ public class MaskImpl implements MaskTemplate{
 		}finally {
 			closeAll(rs, ps, conn);
 		}
-						
-			
 	}
 
+	public int InputOrderNum() {
+		Calendar cal = Calendar.getInstance();
+		int hour=cal.get(Calendar.HOUR_OF_DAY);
+		int day=cal.get(Calendar.DAY_OF_YEAR);
+		return day*100+hour;
+	}
+		
 	// order_status 확인을 위한 메서드
-	public int chaeckOrderStatus(int id, int productNum, Connection conn) throws Exception {
+	public int checkOrderStatus(int id, int productNum, Connection conn) throws Exception {
 		Properties ppt=getProperties();
 		String query= ppt.getProperty("jdbc.sql.pay_select");
 		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setInt(1,id);
-		ps.setInt(2,productNum);
+		ps.setInt(1,id);ps.setInt(2,productNum);
 		ResultSet rs = ps.executeQuery();
 		if(rs.next()) {
 			System.out.println("consumerId : "+rs.getInt("consumer_id")+
@@ -310,23 +329,19 @@ public class MaskImpl implements MaskTemplate{
 							", orderStatus : "+rs.getInt("order_status")+
 							", shipStatus : "+rs.getInt("ship_status"));
 			}
-		return rs.getInt("order_status");
-		
+		return rs.getInt("order_status");	
 	}
-	public int chaeckShipStatus(int id, int productNum, Connection conn) throws Exception {
+	
+	public int checkShipStatus(int id, int productNum, Connection conn) throws Exception {
 		Properties ppt=getProperties();
 		String query= ppt.getProperty("jdbc.sql.pay_select");
 		PreparedStatement ps = conn.prepareStatement(query);
-		ps.setInt(1,id);
-		ps.setInt(2,productNum);
+		ps.setInt(1,id); ps.setInt(2,productNum);
 		ResultSet rs = ps.executeQuery();
-		if(rs.next()) {
-			System.out.println("shipStatus : "+rs.getInt("ship_status"));
-			}
+		if(rs.next()) System.out.println("shipStatus : "+rs.getInt("ship_status"));
 			return rs.getInt("ship_status");
 		}
-		
-	
+			
 	@Override
 	public void delivery(int orderNum) throws Exception {	// 1=배송준비 2=배송중 3=배송완료
 		Connection conn = null;
@@ -392,46 +407,39 @@ public class MaskImpl implements MaskTemplate{
 	 * @throws SQLException 
 	 * @throws FileNotFoundException 
 	 */
+
 	
 	@Override
-	public boolean isProductExist(String productName,Connection conn) throws Exception {
-		String sql_isProductExist="SELECT * FROM product where product_name=?";
-		PreparedStatement ps=conn.prepareStatement(sql_isProductExist);
-		ps.setString(1,productName);
-		ResultSet rs = ps.executeQuery();
-		//if(rs.next()) System.out.println(rs.getString("product_name"));
-		return rs.next();
-	}
-	
-	@Override
-	public void addProductMask(Product product) throws Exception {
+	public void addProductMask(Product product) throws OutOfStockException, Exception {
 		Connection conn=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		Properties ppt=getProperties();
-		// 1) 기존 상품이 있는지 확인 --- 없으면 INSERT
+		// 1) 기존 상품이 있는지 확인 --- 있으면 update
 		try {
 		conn=getConnect();
-		if(isProductExist(product.getProductName(), conn)) {
-			if(rs.getInt("size")==product.getSize()){
-				int q=rs.getInt("stock");
-				int addQ=product.getStock();
-				int newQuantity=addQ+q;
-				String sql=ppt.getProperty("jdbc.sql.addProductMask_update");
-				ps=conn.prepareStatement(sql);
-				ps.setString(2,product.getProductName());
-				ps.setInt(3,product.getSize());
-				ps.setInt(1,newQuantity);
-				System.out.println(ps.executeUpdate()+"개 상품 추가 입고 완료 ===== ");}	
-			// 2) ---- 기존에 있는 상품이면 Update
-			else {
-				String sql=ppt.getProperty("jdbc.sql.addProductMask_insert");
-				ps=conn.prepareStatement(sql);
-				ps.setString(1,product.getProductName());
-				ps.setInt(2,product.getStock());
-				ps.setInt(3,product.getSize());		
-				System.out.println("===== "+ps.executeUpdate()+"개의 상품 입고 완료 ===== ");}
-		}
+		ps=conn.prepareStatement("select stock from product where product_name=? and size=?");
+		ps.setInt(1,product.getProductNum());ps.setInt(2,product.getSize());
+		rs=ps.executeQuery();
+		rs.next();
+		if(rs.next()) {
+			int q=rs.getInt("stock");
+			int newQ=q+product.getSize();	
+			String sql_addProductMask_update=ppt.getProperty("jdbc.sql.addProductMask_update");
+			PreparedStatement ps1=conn.prepareStatement(sql_addProductMask_update);
+			ps1.setString(2,product.getProductName());
+			ps1.setInt(3,product.getSize());
+			ps1.setInt(1,newQ);
+			// 아래 코드에서 Exception in thread "main" com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation:
+			System.out.println(ps1.executeUpdate()+"개 상품 추가 입고 완료 ===== ");
+		// 2) ---- 기존에 없는 상품이면 insert
+		}else {
+			String sql_addProductMask_insert=ppt.getProperty("jdbc.sql.addProductMask_insert");
+			PreparedStatement ps2=conn.prepareStatement(sql_addProductMask_insert);
+			ps2.setString(1,product.getProductName());
+			ps2.setInt(2,product.getStock());
+			ps2.setInt(3,product.getSize());		
+			System.out.println("===== "+ps.executeUpdate()+"개의 상품 입고 완료 ===== ");}
 		}finally {
 			closeAll(rs,ps,conn);
 		}
@@ -527,10 +535,10 @@ public class MaskImpl implements MaskTemplate{
 	/**매출 순위
 	 * 분석함수
 	 * @author 정용
-	 * @throws SQLException 
+	 * @throws Exception 
 	 */
 	@Override
-	public ArrayList<String> rankOfSales() throws SQLException {
+	public ArrayList<String> rankOfSales() throws Exception {
 		Connection conn = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -538,14 +546,11 @@ public class MaskImpl implements MaskTemplate{
 		
 		try { 
 			conn = getConnect();
-			String query = "jdbc.sql.rankOfSales";
-
+			Properties ppt=getProperties();
+			String query =ppt.getProperty("jdbc.sql.rankOfSales");
 			ps = conn.prepareStatement(query);
 			rs = ps.executeQuery();
-			
-			while(rs.next()) {
-				list.add(new String(rs.getString("product_name")+rs.getInt("sales")));
-			}
+			while(rs.next()) list.add(new String(rs.getString("product_name")+rs.getInt("sales")));
 		}finally {
 			closeAll(rs, ps, conn);
 		}
@@ -555,11 +560,26 @@ public class MaskImpl implements MaskTemplate{
 	/**구매 날짜별 판매량 
 	 * 분석함수
 	 * @author 소희
+	 * @throws Exception 
 	 */
 	@Override
-	public String SalesOfDate() {
-		// TODO Auto-generated method stub
-		return null;
+	public void SalesOfDate() throws Exception {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String result="";
+		try { 
+			conn = getConnect();
+			Properties ppt=getProperties();
+			String query =ppt.getProperty("jdbc.sql.SalesOfDate");
+			ps = conn.prepareStatement(query);
+			rs = ps.executeQuery();
+			while(rs.next()) {
+				System.out.println("날짜 : "+rs.getInt("date")+"/ 판매 수량 :"+rs.getInt("quantity"));
+			} 
+		}finally {
+			closeAll(rs, ps, conn);
+		}
 	}
-
+	
 }

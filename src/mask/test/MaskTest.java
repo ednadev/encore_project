@@ -28,15 +28,15 @@ public class MaskTest {
 		//getCart(mi);//미제사건
 		//deleteMask(mi);
 		//addMask(mi);
-		payment(mi);
+		// payment(mi);
 		//delivery(mi);
 		//updateMask(mi);
-		//addProductMask(mi);
+		// addProductMask(mi);
 		//getProduct(mi);
 		//updateProductMask(mi);
 		//getQuatityOverSize(mi);
 		//rankOfSales(mi);
-		//salesOfDate(mi);		
+		salesOfDate(mi);		
 		
 		
 		//-------------------------
@@ -225,7 +225,7 @@ public class MaskTest {
 		}
 		
 		//매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 - ArrayList<String> rankOfSales()
-		public static void rankOfSales(MaskImpl mi) throws SQLException {
+		public static void rankOfSales(MaskImpl mi) throws Exception {
 			System.out.println("매출 순위 확인");
 			for(String s : mi.rankOfSales()) {
 				System.out.println(s.toString());
@@ -233,8 +233,9 @@ public class MaskTest {
 		}
 		
 		//구매 날짜별 판매량  - String SalesOfDate()
-		public static void salesOfDate(MaskImpl mi) {
-			System.out.println("구매 날짜별 판매량 확인: " + mi.SalesOfDate());
+		public static void salesOfDate(MaskImpl mi) throws Exception {
+			System.out.println("구매 날짜별 판매량 확인: ");
+			mi.SalesOfDate();
 		}			
 					
 		//이부분 시간되면..

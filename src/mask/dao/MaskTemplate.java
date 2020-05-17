@@ -43,16 +43,12 @@ public interface MaskTemplate {
 	//1.사이즈별 재고수량조회  ex)"대 : 27개, 중 : 30개 ,소 : 10개" >> String 형식으로 출력하기
 	String getQuatityOverSize() throws Exception;
 	//2.매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 
-	ArrayList<String> rankOfSales() throws SQLException;
+	ArrayList<String> rankOfSales() throws SQLException, Exception;
 	//3. 구매 날짜별 판매량 
-	String SalesOfDate();
+	void SalesOfDate() throws Exception;
 	Connection getConnect() throws SQLException;
 	void closeAll(PreparedStatement ps, Connection conn) throws SQLException;
 	void closeAll(ResultSet rs, PreparedStatement ps, Connection conn) throws SQLException;
-
-	Properties getProperties() throws Exception;
-	boolean isProductExist(String productName, Connection conn) throws Exception;
-	boolean isConsumerExist(int id, Connection conn) throws Exception;
 	
 /*	//4. 마스크 사이즈별 회원 연령조회 >> 회원아이디에서
 	String getAgeOverSize();
