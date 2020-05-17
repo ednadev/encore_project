@@ -85,17 +85,9 @@ public class MaskImpl implements MaskTemplate{
 		ppt.load(new FileInputStream("src/config/jdbc.properties"));
 		return ppt;
 	}
-
-	public boolean isProductExist(String productName, int size,Connection conn) throws Exception {
-		String sql_isProductExist="SELECT * FROM product where product_name=? and size=?";
-		PreparedStatement ps=conn.prepareStatement(sql_isProductExist);
-		ps.setString(1,productName); ps.setInt(2,size);
-		ResultSet rs = ps.executeQuery();
-		return rs.next();
-	}
 	
 	public boolean isConsumerExist(int id,Connection conn) throws Exception {
-		String sql_isConsumerExist="SELECT id FROM consumer where id=?";
+		String sql_isConsumerExist="SELECT * FROM consumer where id=?";
 		PreparedStatement ps=conn.prepareStatement(sql_isConsumerExist);
 		ps.setInt(1,id);
 		ResultSet rs = ps.executeQuery();
@@ -221,7 +213,7 @@ public class MaskImpl implements MaskTemplate{
 			
 			if(id==cart.getConsumerid()) {
 				ppt=getProperties();//추가된 코드
-				String query = "jdbc.sql.addMask";
+				String query = ppt.getProperty("jdbc.sql.addMask");
 				ps = conn.prepareStatement(query);
 				rs= ps.executeQuery();
 				
@@ -408,38 +400,48 @@ public class MaskImpl implements MaskTemplate{
 	 * @throws FileNotFoundException 
 	 */
 
+	public boolean isProductExist(String productName, int size,Connection conn) throws Exception {
+		String sql_isProductExist="SELECT * FROM product where product_name=? and size=?";
+		PreparedStatement ps=conn.prepareStatement(sql_isProductExist);
+		ps.setString(1,productName); ps.setInt(2,size);
+		ResultSet rs = ps.executeQuery();
+		return rs.next();
+	}
 	
 	@Override
-	public void addProductMask(Product product) throws OutOfStockException, Exception {
+	public void addProductMask(Product product) throws Exception {
 		Connection conn=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		Properties ppt=getProperties();
 		// 1) 기존 상품이 있는지 확인 --- 있으면 update
 		try {
-		conn=getConnect();
-		ps=conn.prepareStatement("select stock from product where product_name=? and size=?");
-		ps.setInt(1,product.getProductNum());ps.setInt(2,product.getSize());
-		rs=ps.executeQuery();
-		rs.next();
-		if(rs.next()) {
-			int q=rs.getInt("stock");
-			int newQ=q+product.getSize();	
-			String sql_addProductMask_update=ppt.getProperty("jdbc.sql.addProductMask_update");
-			PreparedStatement ps1=conn.prepareStatement(sql_addProductMask_update);
-			ps1.setString(2,product.getProductName());
-			ps1.setInt(3,product.getSize());
-			ps1.setInt(1,newQ);
-			// 아래 코드에서 Exception in thread "main" com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation:
-			System.out.println(ps1.executeUpdate()+"개 상품 추가 입고 완료 ===== ");
+			conn=getConnect();
+			if(!isProductExist(product.getProductName(),product.getSize(),conn)) {
+				String sql_addProductMask_insert=ppt.getProperty("jdbc.sql.addProductMask_insert");
+				PreparedStatement ps2=conn.prepareStatement(sql_addProductMask_insert);
+				ps2.setString(1,product.getProductName());
+				ps2.setInt(2,product.getStock());
+				ps2.setInt(3,product.getSize());		
+				System.out.println("===== "+ps2.executeUpdate()+"개의 상품 입고 완료 ===== ");}
+			else {
+				ps=conn.prepareStatement("select stock from product where product_name=? and size=?");
+				ps.setInt(1,product.getProductNum()); ps.setInt(2,product.getSize());
+				rs=ps.executeQuery();
+				int q=0;
+				while(rs.next()) {q=rs.getInt("stock");}
+				int newQ=q+product.getStock();
+				rs.close();
+				ps.close();
+				String sql_addProductMask_update=ppt.getProperty("jdbc.sql.addProductMask_update");
+				PreparedStatement ps1=conn.prepareStatement(sql_addProductMask_update);
+				ps1.setString(2,product.getProductName());
+				ps1.setInt(3,product.getSize());
+				ps1.setInt(1,newQ);
+				// 아래 코드에서 Exception in thread "main" com.mysql.cj.jdbc.exceptions.MysqlDataTruncation: Data truncation:
+				System.out.println(ps1.executeUpdate()+"개 상품 추가 입고 완료 ===== ");
 		// 2) ---- 기존에 없는 상품이면 insert
-		}else {
-			String sql_addProductMask_insert=ppt.getProperty("jdbc.sql.addProductMask_insert");
-			PreparedStatement ps2=conn.prepareStatement(sql_addProductMask_insert);
-			ps2.setString(1,product.getProductName());
-			ps2.setInt(2,product.getStock());
-			ps2.setInt(3,product.getSize());		
-			System.out.println("===== "+ps.executeUpdate()+"개의 상품 입고 완료 ===== ");}
+		}	
 		}finally {
 			closeAll(rs,ps,conn);
 		}
@@ -485,7 +487,7 @@ public class MaskImpl implements MaskTemplate{
 			ps.setInt(1,product.getProductNum());
 			rs=ps.executeQuery();
 			int s =0;
-			if(rs.next()) { 
+			if(rs.next()) {
 				System.out.println(rs.getString("product_name")+"/"+rs.getInt("stock"));
 				s=rs.getInt("stock");}
 			int newStock=s-product.getStock();
@@ -510,26 +512,27 @@ public class MaskImpl implements MaskTemplate{
 	 * @throws FileNotFoundException 
 	 */
 	@Override
-	public String getQuatityOverSize() throws Exception {
+	public void getQuatityOverSize() throws Exception {
 		Connection conn=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
-		Properties ppt=null;
-		getProperties();
-		String message = null;
+		Properties ppt=getProperties();
+		
+		String result = "";
 		try {
 		conn=getConnect();
 		String sql=ppt.getProperty("jdbc.sql.getQuatityOverSize");
-		ps=conn.prepareStatement(sql);
-		//int row=ps.executeUpdate();
-		
+		ps=conn.prepareStatement(sql);	
+		rs=ps.executeQuery();
 		while(rs.next()) {
-			//message="마스크 사이즈 별\n"+  :"+row+"\n중 : ";"
-			}
+			if(rs.getInt("size")==1) result= " 소  : "+rs.getInt("stock")+"개";
+			else if(rs.getInt("size")==2) result= " 중 : "+rs.getInt("stock")+"개";
+			else if(rs.getInt("size")==3) result= " 대  : "+rs.getInt("stock")+"개";
+			System.out.println(result);
+		}
 		}finally {
 			closeAll(rs,ps, conn);
 		}
-		return message;
 	}
 
 	/**매출 순위
@@ -576,9 +579,31 @@ public class MaskImpl implements MaskTemplate{
 			rs = ps.executeQuery();
 			while(rs.next()) {
 				System.out.println("날짜 : "+rs.getInt("date")+"/ 판매 수량 :"+rs.getInt("quantity"));
-			} 
+			}
 		}finally {
 			closeAll(rs, ps, conn);
+		}
+	}
+	
+	@Override
+	public void updateAddress(int consumerid, String address) throws Exception {
+		Connection conn = null;
+		PreparedStatement ps = null;
+		Properties ppt = getProperties();
+		
+		try {
+			conn = getConnect();
+			if(!isConsumerExist(consumerid, conn)) {
+				throw new RecordNotFoundException("해당 고객번호가 존재하지 않습니다.");
+			}else {	
+				String query =ppt.getProperty("jdbc.sql.updateAddress") ;
+				ps = conn.prepareStatement(query);
+				ps.setString(1, address);
+				ps.setInt(2, consumerid);
+				System.out.println(ps.executeUpdate()+"건이 수정되었습니다.");
+			}
+		}finally{ 
+			closeAll(ps, conn);
 		}
 	}
 	

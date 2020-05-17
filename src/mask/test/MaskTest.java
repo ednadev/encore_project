@@ -23,20 +23,20 @@ public class MaskTest {
 		//출력 부분을 일단 간단하게 작업한 상태라 혹시 수정하고픈 사항이 있으면..
 		//각 출력부분 메소드 위에서 F3키 눌러서 이동하여 해당 메소드만 수정하시면 됩니다
 		
-		//login(mi);
-		//addConsumer(mi);
-		//getCart(mi);//미제사건
-		//deleteMask(mi);
-		//addMask(mi);
+		// login(mi);
+		// addConsumer(mi);
+		// getCart(mi);//미제사건
+		// deleteMask(mi);
+		// addMask(mi);
 		// payment(mi);
-		//delivery(mi);
-		//updateMask(mi);
+		// delivery(mi);
+		// updateMask(mi);
 		// addProductMask(mi);
-		//getProduct(mi);
-		//updateProductMask(mi);
-		//getQuatityOverSize(mi);
-		//rankOfSales(mi);
-		salesOfDate(mi);		
+		// getProduct(mi);
+		// updateProductMask(mi);
+		// getQuatityOverSize(mi);
+		// rankOfSales(mi);
+		// salesOfDate(mi);		
 		
 		
 		//-------------------------
@@ -150,6 +150,8 @@ public class MaskTest {
 			int id = sc.nextInt();
 			System.out.println("구매할 마스크를 입력해주세요.");
 			String productName = sc.next();
+			System.out.println("구매할 마스크 사이즈를 입력해주세요.");
+			int size= sc.nextInt();
 			mi.addMask(id, new Cart(id));
 			System.out.println("마스크 구매 완료!");
 		}
@@ -192,10 +194,10 @@ public class MaskTest {
 			System.out.println("상품명을 입력해주세요.");
 			String productName = sc.next();
 			System.out.println("상품 수량을 입력해주세요.");
-			int quantity = sc.nextInt();
+			int stock = sc.nextInt();
 			System.out.println("상품 크기를 입력해주세요.");
 			int size = sc.nextInt();
-			mi.addProductMask(new Product(productName,quantity,size));
+			mi.addProductMask(new Product(productName,stock,size));
 		}
 		
 		//상품 조회 - ArrayList<Product> getProducts()
@@ -221,7 +223,8 @@ public class MaskTest {
 		
 		//사이즈별 재고수량조회  ex)"대 : 27개, 중 : 30개 ,소 : 10개" >> String 형식으로 출력하기 - String getQuatityOverSize()
 		public static void getQuatityOverSize(MaskImpl mi) throws Exception {
-			System.out.println("사이즈별 재고수량: " + mi.getQuatityOverSize());
+			System.out.println("======사이즈별 재고수량=======");
+			mi.getQuatityOverSize();
 		}
 		
 		//매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 - ArrayList<String> rankOfSales()
@@ -234,7 +237,7 @@ public class MaskTest {
 		
 		//구매 날짜별 판매량  - String SalesOfDate()
 		public static void salesOfDate(MaskImpl mi) throws Exception {
-			System.out.println("구매 날짜별 판매량 확인: ");
+			System.out.println("====== 구매 날짜별 판매량 확인 =======");
 			mi.SalesOfDate();
 		}			
 					
@@ -246,6 +249,6 @@ public class MaskTest {
 		
 		//마스크 사이즈별 회원 성별조회  >> 회원아이디에서 - String getGenderOverSize()
 		public static void getGenderOverSize(MaskImpl mi) {
-
+			
 		}
 	}

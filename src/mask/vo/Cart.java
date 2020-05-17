@@ -10,7 +10,6 @@ public class Cart {
 	private Product product;
 	
 	
-	
 	public Cart(int orderNum, int consumerid, int productNum, int orderStatus, int shipStatus, int quantity, int size, Product product) {
 		this.orderNum = orderNum;
 		this.consumerid = consumerid;

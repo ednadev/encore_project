@@ -38,10 +38,13 @@ public interface MaskTemplate {
 	ArrayList<Product> getProducts() throws Exception;
 	//10.상품 출고
 	void updateProductMask(Product product) throws Exception;
-
+	//11. 주소변경
+	void updateAddress(int consumerid, String address) throws Exception;
+	
+	
 	//// 분석함수
 	//1.사이즈별 재고수량조회  ex)"대 : 27개, 중 : 30개 ,소 : 10개" >> String 형식으로 출력하기
-	String getQuatityOverSize() throws Exception;
+	void getQuatityOverSize() throws Exception;
 	//2.매출 순위 (인기,품절임박...)>> 매출=ship_status(int: 팔리면 1)의 합 
 	ArrayList<String> rankOfSales() throws SQLException, Exception;
 	//3. 구매 날짜별 판매량 
